@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Performance - Heart Disease Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body { background-color: #f4f7f6; padding-top: 30px; }
+        .container { background-color: white; border-radius: 10px; padding: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #3c3c3c; margin-bottom: 25px; }
+        table { font-size: 0.9em; }
+        th { text-align: center; vertical-align: middle !important; }
+        td { text-align: center; vertical-align: middle; }
+        .table-container { overflow-x: auto; }
+        .img-container { margin-top: 30px; text-align: center; }
+        .img-container img { max-width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; }
+        .best { font-weight: bold; color: #28a745; }
+        .rank-1 { background-color: #d4edda; }
+        .rank-2 { background-color: #fff3cd; }
+        .rank-3 { background-color: #f8d7da; }
+        .nav-link.active { font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="/">Heart Disease Predictor</a>
+        <div class="navbar-nav">
+            <a class="nav-link" href="/">Predict</a>
+            <a class="nav-link active" href="/models">Model Performance</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h2>Model Performance Comparison</h2>
+    <p class="text-center text-muted">All models trained on 1025 patient records (80/20 train-test split) from the UCI Heart Disease dataset.</p>
+
+    {% if table_data %}
+    <div class="table-container">
+        <table class="table table-bordered table-hover table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Model</th>
+                    <th>Accuracy (%)</th>
+                    <th>Precision (%)</th>
+                    <th>Recall (%)</th>
+                    <th>F1-Score (%)</th>
+                    <th>ROC-AUC (%)</th>
+                    <th>Specificity (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in table_data %}
+                <tr>
+                    <td><strong>{{ row['Model'] }}</strong></td>
+                    <td>{{ row['Accuracy'] }}</td>
+                    <td>{{ row['Precision'] }}</td>
+                    <td>{{ row['Recall'] }}</td>
+                    <td>{{ row['F1-Score'] }}</td>
+                    <td>{{ row['ROC-AUC'] }}</td>
+                    <td>{{ row['Specificity'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">No results found. Run <code>python train.py</code> first to generate model performance data.</div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6 img-container">
+            <h4>Line Chart Comparison</h4>
+            <img src="/static/results/comparison_line.png" alt="Line Chart" onerror="this.style.display='none'" />
+        </div>
+        <div class="col-md-6 img-container">
+            <h4>Bar Chart Comparison</h4>
+            <img src="/static/results/comparison_bar.png" alt="Bar Chart" onerror="this.style.display='none'" />
+        </div>
+    </div>
+
+    <div class="img-container">
+        <h4>Confusion Matrices</h4>
+        <img src="/static/results/confusion_matrices.png" alt="Confusion Matrices" onerror="this.style.display='none'" />
+    </div>
+
+    <p class="text-center mt-4"><a href="/" class="btn btn-primary">Back to Predictor</a></p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

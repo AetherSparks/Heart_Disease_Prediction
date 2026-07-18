@@ -6,89 +6,200 @@
     <title>Heart Disease Prediction</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        body {
-            background-color: #f4f7f6;
-            padding-top: 50px;
-        }
-        .container {
-            background-color: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .form-control {
-            margin-bottom: 10px;
-        }
-        .btn-primary {
-            width: 100%;
-        }
-        h2 {
-            text-align: center;
-            color: #3c3c3c;
-        }
-        .result {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #f1f1f1;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .result h3 {
-            color: #28a745;
-        }
-        .result p {
-            font-size: 1.2em;
-        }
-        .note {
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 10px;
-        }
+        body { background-color: #f4f7f6; padding-top: 30px; }
+        .container { background-color: white; border-radius: 10px; padding: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #3c3c3c; margin-bottom: 25px; }
+        .result-card { margin-top: 25px; padding: 20px; border-radius: 8px; text-align: center; }
+        .result-card.danger { background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        .result-card.success { background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .result-card h3 { margin-bottom: 15px; }
+        .result-card.danger h3 { color: #721c24; }
+        .result-card.success h3 { color: #155724; }
+        .result-card p { font-size: 1.1em; margin-bottom: 5px; }
+        .metric-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.85em; margin: 2px; }
+        .metric-badge.acc { background: #007bff; color: white; }
+        .metric-badge.prec { background: #28a745; color: white; }
+        .metric-badge.rec { background: #17a2b8; color: white; }
+        .metric-badge.f1 { background: #6f42c1; color: white; }
+        .metric-badge.auc { background: #e83e8c; color: white; }
+        .nav-link.active { font-weight: bold; }
+        .form-row { margin-bottom: 8px; }
+        .form-row label { font-weight: 500; font-size: 0.9em; }
+        .form-row small { font-size: 0.78em; }
     </style>
 </head>
 <body>
 
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="/">Heart Disease Predictor</a>
+        <div class="navbar-nav">
+            <a class="nav-link active" href="/">Predict</a>
+            <a class="nav-link" href="/models">Model Performance</a>
+        </div>
+    </div>
+</nav>
+
 <div class="container">
     <h2>Heart Disease Prediction</h2>
+    <p class="text-center text-muted">Enter patient clinical data and choose a model to predict heart disease risk.</p>
+
     <form action="/" method="POST">
-        <div class="form-group">
-            <label for="features">Enter Features (comma-separated):</label>
-            <input type="text" class="form-control" id="features" name="features" placeholder="e.g., 63,1,1,145,233,1,2,150,0,2.3,3,0,6" required>
-            <small class="text-muted">13 features: age,sex,cp,trestbps,chol,fbs,restecg,thalach,exang,oldpeak,slope,ca,thal</small>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-row">
+                    <label for="age">{{ feature_labels['age'] }}</label>
+                    <input type="number" class="form-control" id="age" name="age"
+                           placeholder="e.g. 63" value="{{ form_data.get('age', '') }}" required>
+                    <small class="text-muted">{{ feature_descriptions['age'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="sex">{{ feature_labels['sex'] }}</label>
+                    <select class="form-control" id="sex" name="sex" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('sex') else '' }}>Select sex</option>
+                        <option value="1" {{ 'selected' if form_data.get('sex') == '1' else '' }}>Male</option>
+                        <option value="0" {{ 'selected' if form_data.get('sex') == '0' else '' }}>Female</option>
+                    </select>
+                    <small class="text-muted">{{ feature_descriptions['sex'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="cp">{{ feature_labels['cp'] }}</label>
+                    <select class="form-control" id="cp" name="cp" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('cp') else '' }}>Select chest pain type</option>
+                        <option value="1" {{ 'selected' if form_data.get('cp') == '1' else '' }}>1 - Typical angina</option>
+                        <option value="2" {{ 'selected' if form_data.get('cp') == '2' else '' }}>2 - Atypical angina</option>
+                        <option value="3" {{ 'selected' if form_data.get('cp') == '3' else '' }}>3 - Non-anginal pain</option>
+                        <option value="4" {{ 'selected' if form_data.get('cp') == '4' else '' }}>4 - Asymptomatic</option>
+                    </select>
+                    <small class="text-muted">{{ feature_descriptions['cp'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="trestbps">{{ feature_labels['trestbps'] }}</label>
+                    <input type="number" class="form-control" id="trestbps" name="trestbps"
+                           placeholder="e.g. 145" value="{{ form_data.get('trestbps', '') }}" required>
+                    <small class="text-muted">{{ feature_descriptions['trestbps'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="chol">{{ feature_labels['chol'] }}</label>
+                    <input type="number" class="form-control" id="chol" name="chol"
+                           placeholder="e.g. 233" value="{{ form_data.get('chol', '') }}" required>
+                    <small class="text-muted">{{ feature_descriptions['chol'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="fbs">{{ feature_labels['fbs'] }}</label>
+                    <select class="form-control" id="fbs" name="fbs" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('fbs') else '' }}>Select</option>
+                        <option value="1" {{ 'selected' if form_data.get('fbs') == '1' else '' }}>1 - True (> 120 mg/dl)</option>
+                        <option value="0" {{ 'selected' if form_data.get('fbs') == '0' else '' }}>0 - False</option>
+                    </select>
+                    <small class="text-muted">{{ feature_descriptions['fbs'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="restecg">{{ feature_labels['restecg'] }}</label>
+                    <select class="form-control" id="restecg" name="restecg" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('restecg') else '' }}>Select ECG result</option>
+                        <option value="0" {{ 'selected' if form_data.get('restecg') == '0' else '' }}>0 - Normal</option>
+                        <option value="1" {{ 'selected' if form_data.get('restecg') == '1' else '' }}>1 - ST-T wave abnormality</option>
+                        <option value="2" {{ 'selected' if form_data.get('restecg') == '2' else '' }}>2 - Left ventricular hypertrophy</option>
+                    </select>
+                    <small class="text-muted">{{ feature_descriptions['restecg'] }}</small>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-row">
+                    <label for="thalach">{{ feature_labels['thalach'] }}</label>
+                    <input type="number" class="form-control" id="thalach" name="thalach"
+                           placeholder="e.g. 150" value="{{ form_data.get('thalach', '') }}" required>
+                    <small class="text-muted">{{ feature_descriptions['thalach'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="exang">{{ feature_labels['exang'] }}</label>
+                    <select class="form-control" id="exang" name="exang" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('exang') else '' }}>Select</option>
+                        <option value="1" {{ 'selected' if form_data.get('exang') == '1' else '' }}>1 - Yes</option>
+                        <option value="0" {{ 'selected' if form_data.get('exang') == '0' else '' }}>0 - No</option>
+                    </select>
+                    <small class="text-muted">{{ feature_descriptions['exang'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="oldpeak">{{ feature_labels['oldpeak'] }}</label>
+                    <input type="number" step="0.1" class="form-control" id="oldpeak" name="oldpeak"
+                           placeholder="e.g. 2.3" value="{{ form_data.get('oldpeak', '') }}" required>
+                    <small class="text-muted">{{ feature_descriptions['oldpeak'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="slope">{{ feature_labels['slope'] }}</label>
+                    <select class="form-control" id="slope" name="slope" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('slope') else '' }}>Select slope</option>
+                        <option value="0" {{ 'selected' if form_data.get('slope') == '0' else '' }}>0 - Upsloping</option>
+                        <option value="1" {{ 'selected' if form_data.get('slope') == '1' else '' }}>1 - Flat</option>
+                        <option value="2" {{ 'selected' if form_data.get('slope') == '2' else '' }}>2 - Downsloping</option>
+                    </select>
+                    <small class="text-muted">{{ feature_descriptions['slope'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="ca">{{ feature_labels['ca'] }}</label>
+                    <input type="number" min="0" max="4" class="form-control" id="ca" name="ca"
+                           placeholder="e.g. 0" value="{{ form_data.get('ca', '') }}" required>
+                    <small class="text-muted">{{ feature_descriptions['ca'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="thal">{{ feature_labels['thal'] }}</label>
+                    <select class="form-control" id="thal" name="thal" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('thal') else '' }}>Select thalassemia</option>
+                        <option value="3" {{ 'selected' if form_data.get('thal') == '3' else '' }}>3 - Normal</option>
+                        <option value="6" {{ 'selected' if form_data.get('thal') == '6' else '' }}>6 - Fixed defect</option>
+                        <option value="7" {{ 'selected' if form_data.get('thal') == '7' else '' }}>7 - Reversible defect</option>
+                    </select>
+                    <small class="text-muted">{{ feature_descriptions['thal'] }}</small>
+                </div>
+                <div class="form-row">
+                    <label for="model">Choose a Model</label>
+                    <select class="form-control" id="model" name="model" required>
+                        <option value="" disabled selected>Select model</option>
+                        {% for m in model_names %}
+                        <option value="{{ m }}">{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">Each model was trained on 1025 records; see <a href="/models">Model Performance</a> for details</small>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="model">Choose a Model:</label>
-            <select class="form-control" id="model" name="model">
-                <option value="Logistic Regression">Logistic Regression</option>
-                <option value="Naive Bayes">Naive Bayes</option>
-                <option value="SVM">Support Vector Machine</option>
-                <option value="KNN">K-Nearest Neighbors</option>
-                <option value="Decision Tree">Decision Tree</option>
-                <option value="Random Forest">Random Forest</option>
-                <option value="XGBoost">XGBoost</option>
-                <option value="Neural Network">Neural Network</option>
-            </select>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Predict</button>
+        <button type="submit" class="btn btn-primary btn-lg mt-3">Predict</button>
     </form>
 
     {% if prediction %}
-        <div class="result">
-            <h3>Prediction Result</h3>
-            <p><strong>Model:</strong> {{ prediction.model }}</p>
-            <p><strong>Prediction:</strong> {{ prediction.prediction }}</p>
-            <p><strong>Interpretation:</strong> {{ prediction.prediction_text }}</p>
-            {% if prediction.raw_output is defined %}
-            <p><strong>Raw Output:</strong> {{ prediction.raw_output }}</p>
+    <div class="result-card {{ prediction.prediction_class }}">
+        <h3>{{ prediction.prediction_text }}</h3>
+        <p><strong>Model:</strong> {{ prediction.model }}</p>
+        <p><strong>Raw Output:</strong> {{ prediction.raw_output }}</p>
+        <hr>
+        <p><strong>Model Performance:</strong></p>
+        <div>
+            {% if prediction.accuracy != 'N/A' %}
+            <span class="metric-badge acc">Accuracy: {{ prediction.accuracy }}%</span>
+            {% endif %}
+            {% if prediction.precision != 'N/A' %}
+            <span class="metric-badge prec">Precision: {{ prediction.precision }}%</span>
+            {% endif %}
+            {% if prediction.recall != 'N/A' %}
+            <span class="metric-badge rec">Recall: {{ prediction.recall }}%</span>
+            {% endif %}
+            {% if prediction.f1 != 'N/A' %}
+            <span class="metric-badge f1">F1: {{ prediction.f1 }}%</span>
+            {% endif %}
+            {% if prediction.roc_auc != 'N/A' %}
+            <span class="metric-badge auc">ROC-AUC: {{ prediction.roc_auc }}%</span>
             {% endif %}
         </div>
+        <p class="mt-2"><a href="/models">View all model comparisons &rarr;</a></p>
+    </div>
     {% endif %}
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
