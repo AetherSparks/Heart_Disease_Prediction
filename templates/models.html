@@ -3,94 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Model Performance - Heart Disease Prediction</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <title>Model Benchmarks - Heart Disease Diagnostic AI</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font Family -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f4f7f6; padding-top: 30px; }
-        .container { background-color: white; border-radius: 10px; padding: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #3c3c3c; margin-bottom: 25px; }
-        table { font-size: 0.9em; }
-        th { text-align: center; vertical-align: middle !important; }
-        td { text-align: center; vertical-align: middle; }
-        .table-container { overflow-x: auto; }
-        .img-container { margin-top: 30px; text-align: center; }
-        .img-container img { max-width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; }
-        .best { font-weight: bold; color: #28a745; }
-        .rank-1 { background-color: #d4edda; }
-        .rank-2 { background-color: #fff3cd; }
-        .rank-3 { background-color: #f8d7da; }
-        .nav-link.active { font-weight: bold; }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-    <div class="container">
-        <a class="navbar-brand" href="/">Heart Disease Predictor</a>
-        <div class="navbar-nav">
-            <a class="nav-link" href="/">Predict</a>
-            <a class="nav-link active" href="/models">Model Performance</a>
+    <!-- Navbar -->
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="h-9 w-9 bg-gradient-to-tr from-rose-500 to-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/20">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                </div>
+                <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">CardioMetrics AI</span>
+            </div>
+            <div class="flex space-x-1 bg-slate-800/60 p-1 rounded-xl border border-slate-700/50">
+                <a href="/" class="px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white transition-all duration-200">Diagnostic Engine</a>
+                <a href="/models" class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 bg-teal-500 text-slate-950 shadow-md shadow-teal-500/10">Model Benchmarks</a>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-<div class="container">
-    <h2>Model Performance Comparison</h2>
-    <p class="text-center text-muted">All models trained on 1025 patient records (80/20 train-test split) from the UCI Heart Disease dataset.</p>
-
-    {% if table_data %}
-    <div class="table-container">
-        <table class="table table-bordered table-hover table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Model</th>
-                    <th>Accuracy (%)</th>
-                    <th>Precision (%)</th>
-                    <th>Recall (%)</th>
-                    <th>F1-Score (%)</th>
-                    <th>ROC-AUC (%)</th>
-                    <th>Specificity (%)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in table_data %}
-                <tr>
-                    <td><strong>{{ row['Model'] }}</strong></td>
-                    <td>{{ row['Accuracy'] }}</td>
-                    <td>{{ row['Precision'] }}</td>
-                    <td>{{ row['Recall'] }}</td>
-                    <td>{{ row['F1-Score'] }}</td>
-                    <td>{{ row['ROC-AUC'] }}</td>
-                    <td>{{ row['Specificity'] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <div class="alert alert-warning">No results found. Run <code>python train.py</code> first to generate model performance data.</div>
-    {% endif %}
-
-    <div class="row">
-        <div class="col-md-6 img-container">
-            <h4>Line Chart Comparison</h4>
-            <img src="/static/results/comparison_line.png" alt="Line Chart" onerror="this.style.display='none'" />
+    <main class="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
+        <!-- Section Header -->
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <span class="text-xs font-semibold uppercase tracking-widest text-teal-400 bg-teal-500/10 px-3 py-1 rounded-full border border-teal-500/20">Evaluation Metrics</span>
+            <h1 class="text-4xl font-extrabold tracking-tight text-white mt-3 mb-4">Architecture Evaluation</h1>
+            <p class="text-slate-400 text-base">Comparative matrix evaluated using cross-validation over 1,025 standardized instances from the UCI heart disease registry.</p>
         </div>
-        <div class="col-md-6 img-container">
-            <h4>Bar Chart Comparison</h4>
-            <img src="/static/results/comparison_bar.png" alt="Bar Chart" onerror="this.style.display='none'" />
+
+        <!-- Table Card Layout -->
+        {% if table_data %}
+        <div class="bg-slate-800/30 rounded-2xl border border-slate-800/80 shadow-2xl overflow-hidden mb-12">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-950 text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800">
+                            <th class="px-6 py-4.5">Model Architecture</th>
+                            <th class="px-6 py-4.5 text-center">Accuracy</th>
+                            <th class="px-6 py-4.5 text-center">Precision</th>
+                            <th class="px-6 py-4.5 text-center">Recall</th>
+                            <th class="px-6 py-4.5 text-center">F1-Score</th>
+                            <th class="px-6 py-4.5 text-center">ROC-AUC</th>
+                            <th class="px-6 py-4.5 text-center">Specificity</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60 text-sm">
+                        {% for row in table_data %}
+                        <tr class="hover:bg-slate-800/30 transition-colors duration-150">
+                            <td class="px-6 py-4 font-semibold text-white whitespace-nowrap">{{ row['Model'] }}</td>
+                            <td class="px-6 py-4 text-center font-mono text-slate-300">{{ row['Accuracy'] }}%</td>
+                            <td class="px-6 py-4 text-center font-mono text-slate-300">{{ row['Precision'] }}%</td>
+                            <td class="px-6 py-4 text-center font-mono text-slate-300">{{ row['Recall'] }}%</td>
+                            <td class="px-6 py-4 text-center font-mono text-slate-300">{{ row['F1-Score'] }}%</td>
+                            <td class="px-6 py-4 text-center font-mono text-slate-300 text-teal-400 font-semibold">{{ row['ROC-AUC'] }}%</td>
+                            <td class="px-6 py-4 text-center font-mono text-slate-300">{{ row['Specificity'] }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+        {% else %}
+        <div class="bg-amber-950/20 border border-amber-800/40 text-amber-400 p-5 rounded-xl flex items-center space-x-3 mb-12">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <p class="text-sm font-medium">No pipeline evaluation records matched. Please execute <code>python train.py</code> to seed statistical evaluation data.</p>
+        </div>
+        {% endif %}
 
-    <div class="img-container">
-        <h4>Confusion Matrices</h4>
-        <img src="/static/results/confusion_matrices.png" alt="Confusion Matrices" onerror="this.style.display='none'" />
-    </div>
+        <!-- Visual Analytics Graph Display -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <div class="bg-slate-800/40 p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col items-center">
+                <h4 class="text-sm font-bold tracking-wider uppercase text-slate-400 mb-4">Metric Trajectory Plots</h4>
+                <div class="w-full bg-slate-900 rounded-xl p-3 border border-slate-800">
+                    <img class="w-full h-auto rounded-lg mx-auto object-contain" src="/static/results/comparison_line.png" alt="Line Chart Comparison" onerror="this.style.display='none'" />
+                </div>
+            </div>
+            <div class="bg-slate-800/40 p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col items-center">
+                <h4 class="text-sm font-bold tracking-wider uppercase text-slate-400 mb-4">Discrete Metric Evaluation (Bar)</h4>
+                <div class="w-full bg-slate-900 rounded-xl p-3 border border-slate-800">
+                    <img class="w-full h-auto rounded-lg mx-auto object-contain" src="/static/results/comparison_bar.png" alt="Bar Chart Comparison" onerror="this.style.display='none'" />
+                </div>
+            </div>
+        </div>
 
-    <p class="text-center mt-4"><a href="/" class="btn btn-primary">Back to Predictor</a></p>
-</div>
+        <div class="bg-slate-800/40 p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col items-center max-w-4xl mx-auto mb-12">
+            <h4 class="text-sm font-bold tracking-wider uppercase text-slate-400 mb-4">Ensemble Disambiguation Matrices</h4>
+            <div class="w-full bg-slate-900 rounded-xl p-4 border border-slate-800">
+                <img class="w-full h-auto rounded-lg mx-auto object-contain" src="/static/results/confusion_matrices.png" alt="Confusion Matrices Assembly" onerror="this.style.display='none'" />
+            </div>
+        </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+        <div class="text-center">
+            <a href="/" class="inline-flex items-center space-x-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-medium text-sm rounded-xl border border-slate-700 transition">
+                <svg class="w-4 h-4 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                <span>Return to Diagnostic Engine</span>
+            </a>
+        </div>
+    </main>
+
 </body>
 </html>
