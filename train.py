@@ -35,17 +35,83 @@ print(f"Dataset saved to: {os.path.abspath(local_csv)}")
 
 dataset = pd.read_csv(local_csv)
 print(f"Dataset loaded: {dataset.shape[0]} rows, {dataset.shape[1]} columns")
+
+dupes = dataset.duplicated(keep=False).sum()
+if dupes:
+    dataset = dataset.drop_duplicates()
+    print(f"Removed {dupes} duplicate rows ({dataset.shape[0]} unique rows remaining)")
+
 print(f"Target distribution:\n{dataset['target'].value_counts()}")
 
-print("\nCorrelation with target:")
-print(dataset.corr()["target"].abs().sort_values(ascending=False))
+def augment_data(df, target_size=1000):
+    np.random.seed(42)
+    current_size = len(df)
+    n_to_generate = target_size - current_size
+    if n_to_generate <= 0:
+        return df
 
+    cont_cols = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
+    cat_binary = ['sex', 'fbs', 'exang']
+    cat_ordinal = {
+        'cp': (1, 4), 'restecg': (0, 2),
+        'slope': (0, 2), 'ca': (0, 4)
+    }
+    cat_nominal = {'thal': [3, 6, 7]}
+
+    bounds = {c: (df[c].min(), df[c].max()) for c in cont_cols}
+    noise_std = {c: df[c].std() * 0.1 for c in cont_cols}
+
+    generated = []
+    for _ in range(n_to_generate):
+        row = df.iloc[np.random.randint(current_size)].copy()
+
+        for c in cont_cols:
+            row[c] = np.clip(np.random.normal(row[c], noise_std[c]), bounds[c][0], bounds[c][1])
+
+        for c in cat_binary:
+            if np.random.random() < 0.1:
+                row[c] = 1 - row[c]
+
+        for c, (lo, hi) in cat_ordinal.items():
+            if np.random.random() < 0.15:
+                row[c] = int(np.clip(row[c] + np.random.choice([-1, 1]), lo, hi))
+
+        for c, vals in cat_nominal.items():
+            if np.random.random() < 0.1:
+                others = [v for v in vals if v != row[c]]
+                row[c] = np.random.choice(others)
+
+        row['age'] = round(row['age'])
+        row['trestbps'] = round(row['trestbps'])
+        row['chol'] = round(row['chol'])
+        row['thalach'] = round(row['thalach'])
+        row['oldpeak'] = round(row['oldpeak'], 1)
+        for c in cat_binary:
+            row[c] = int(row[c])
+        for c in list(cat_ordinal) + list(cat_nominal):
+            row[c] = int(row[c])
+
+        generated.append(row)
+
+    result = pd.concat([df, pd.DataFrame(generated)], ignore_index=True)
+    result = result.drop_duplicates()
+    print(f"Augmented: {len(df)} original -> {len(result)} total ({len(result) - len(df)} synthetic)")
+    return result
+
+
+print("\nSplitting original data (80/20) then augmenting training set...")
 predictors = dataset.drop("target", axis=1)
 target = dataset["target"]
 X_train, X_test, Y_train, Y_test = train_test_split(
     predictors, target, test_size=0.20, random_state=0
 )
-print(f"\nTraining data: {X_train.shape}, Testing data: {X_test.shape}")
+
+train_df = pd.concat([X_train, Y_train], axis=1)
+train_df = augment_data(train_df, target_size=1000)
+X_train = train_df.drop("target", axis=1)
+Y_train = train_df["target"]
+
+print(f"Training data: {X_train.shape}, Testing data: {X_test.shape} (test is original only)")
 
 models = {
     "Logistic Regression": LogisticRegression(),
