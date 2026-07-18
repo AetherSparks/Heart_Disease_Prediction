@@ -1,0 +1,32 @@
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# Python source files
+*.py text diff=python
+*.pyw text
+
+# HTML/Jinja templates
+*.html text
+
+# CSS
+*.css text
+
+# Config files
+*.json text
+*.toml text
+*.cfg text
+*.ini text
+
+# Git files
+.gitignore text
+.gitattributes text
+
+# Model files (binary)
+*.pkl binary
+*.h5 binary
+
+# CSV (text)
+*.csv text
+
+# Environment
+flaskvenv/ binary

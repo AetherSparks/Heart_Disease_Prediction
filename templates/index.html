@@ -39,6 +39,11 @@
         .result p {
             font-size: 1.2em;
         }
+        .note {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -49,6 +54,7 @@
         <div class="form-group">
             <label for="features">Enter Features (comma-separated):</label>
             <input type="text" class="form-control" id="features" name="features" placeholder="e.g., 63,1,1,145,233,1,2,150,0,2.3,3,0,6" required>
+            <small class="text-muted">13 features: age,sex,cp,trestbps,chol,fbs,restecg,thalach,exang,oldpeak,slope,ca,thal</small>
         </div>
 
         <div class="form-group">
@@ -74,7 +80,9 @@
             <p><strong>Model:</strong> {{ prediction.model }}</p>
             <p><strong>Prediction:</strong> {{ prediction.prediction }}</p>
             <p><strong>Interpretation:</strong> {{ prediction.prediction_text }}</p>
+            {% if prediction.raw_output is defined %}
             <p><strong>Raw Output:</strong> {{ prediction.raw_output }}</p>
+            {% endif %}
         </div>
     {% endif %}
 </div>

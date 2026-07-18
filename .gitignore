@@ -1,0 +1,11 @@
+flaskvenv/
+__pycache__/
+*.pyc
+*.pyo
+data/
+.DS_Store
+.vscode/
+.idea/
+*.egg-info/
+dist/
+build/
