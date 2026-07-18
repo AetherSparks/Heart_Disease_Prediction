@@ -16,7 +16,12 @@ model_info = {
     "Neural Network": {"file": "neural_network_model.pkl", "label": "Neural Network"},
 }
 
-models = {k: joblib.load(f"models/{v['file']}") for k, v in model_info.items()}
+models = {}
+for k, v in model_info.items():
+    try:
+        models[k] = joblib.load(f"models/{v['file']}")
+    except (ModuleNotFoundError, FileNotFoundError) as e:
+        print(f"Warning: Could not load model '{k}': {e}")
 
 try:
     results_df = pd.read_csv("static/results/comparison.csv")
@@ -127,7 +132,7 @@ def index():
                            feature_labels=FEATURE_LABELS,
                            feature_descriptions=FEATURE_DESCRIPTIONS,
                            feature_names=FEATURE_NAMES,
-                           model_names=list(model_info.keys()))
+                           model_names=list(models.keys()))
 
 
 @app.route("/models")
