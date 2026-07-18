@@ -1,66 +1,103 @@
 # Heart Disease Prediction
 
-A Flask web application that predicts the presence of heart disease in a patient using 8 different machine learning models. Users can input 13 clinical features via a web UI and get predictions from any model they choose.
+A Flask web application that predicts the presence of heart disease using 8 machine learning models. Users input 13 clinical features via individual form fields and get predictions from any chosen model, along with its performance metrics.
 
 ## Tech Stack
 
 - **Backend:** Python 3.9+, Flask, Gunicorn
 - **ML Libraries:** scikit-learn, XGBoost
-- **Frontend:** HTML, Bootstrap 4
-- **Dataset:** [UCI Heart Disease Dataset](https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset) (1025 records, downloaded via kagglehub)
+- **Frontend:** HTML, Bootstrap 4 / Tailwind CSS
+- **Dataset:** [UCI Heart Disease Dataset](https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset) (1025 records → 302 unique after dedup)
 
 ## Dataset
 
-The dataset is automatically downloaded from Kaggle via `kagglehub` when you run `train.py`. It contains **1025 patient records** with 13 clinical features and a binary target:
+The dataset is automatically downloaded from Kaggle via `kagglehub` when you run `train.py`.
 
-| # | Feature | Description |
-|---|---------|-------------|
-| 1 | `age` | Age in years |
-| 2 | `sex` | 1 = male, 0 = female |
-| 3 | `cp` | Chest pain type (1: typical angina, 2: atypical angina, 3: non-anginal pain, 4: asymptomatic) |
-| 4 | `trestbps` | Resting blood pressure (mm Hg) |
-| 5 | `chol` | Serum cholesterol (mg/dl) |
-| 6 | `fbs` | Fasting blood sugar > 120 mg/dl (1 = true, 0 = false) |
-| 7 | `restecg` | Resting ECG results (0, 1, 2) |
-| 8 | `thalach` | Maximum heart rate achieved |
-| 9 | `exang` | Exercise induced angina (1 = yes, 0 = no) |
-| 10 | `oldpeak` | ST depression induced by exercise relative to rest |
-| 11 | `slope` | Slope of the peak exercise ST segment |
-| 12 | `ca` | Number of major vessels (0-3) colored by fluoroscopy |
-| 13 | `thal` | Thalassemia (3 = normal, 6 = fixed defect, 7 = reversible defect) |
-| **Target** | `target` | 0 = no heart disease, 1 = heart disease present |
+- **Raw:** 1025 rows (723 are exact duplicates from aggregated UCI sources)
+- **After dedup:** 302 unique patient records
+- **After augmentation:** ~1000 rows (original + synthetic variations)
+- **Features:** 13 clinical attributes + binary target
 
-## Models
+| # | Feature | Type | Description |
+|---|---------|------|-------------|
+| 1 | `age` | Continuous | Age in years |
+| 2 | `sex` | Binary | 1 = male, 0 = female |
+| 3 | `cp` | Ordinal | Chest pain type (1-4) |
+| 4 | `trestbps` | Continuous | Resting blood pressure (mm Hg) |
+| 5 | `chol` | Continuous | Serum cholesterol (mg/dl) |
+| 6 | `fbs` | Binary | Fasting blood sugar > 120 mg/dl |
+| 7 | `restecg` | Ordinal | Resting ECG results (0-2) |
+| 8 | `thalach` | Continuous | Max heart rate achieved |
+| 9 | `exang` | Binary | Exercise induced angina |
+| 10 | `oldpeak` | Continuous | ST depression induced by exercise |
+| 11 | `slope` | Ordinal | ST segment slope (0-2) |
+| 12 | `ca` | Ordinal | Major vessels colored (0-4) |
+| 13 | `thal` | Nominal | Thalassemia (3, 6, 7) |
+| **Target** | `target` | Binary | 0 = no disease, 1 = disease present |
 
-All 8 models are trained on an 80/20 train-test split and saved to `models/`:
+## Models & Performance
 
-| Model | Type | File |
-|-------|------|------|
-| Logistic Regression | Linear classifier | `logistic_regression_model.pkl` |
-| Naive Bayes (Gaussian) | Probabilistic classifier | `naive_bayes_model.pkl` |
-| Support Vector Machine | Linear SVM | `support_vector_machine_model.pkl` |
-| K-Nearest Neighbors | Distance-based (k=7) | `k_nearest_neighbors_model.pkl` |
-| Decision Tree | Tree-based | `decision_tree_model.pkl` |
-| Random Forest | Ensemble (bagging) | `random_forest_model.pkl` |
-| XGBoost | Gradient boosting | `xgboost_model.pkl` |
-| Neural Network (MLP) | 1 hidden layer (11 neurons), ReLU activation | `neural_network_model.pkl` |
+All models evaluated on a held-out original test set (61 records). Training data augmented from 241 → 1000 rows.
+
+| Model | Accuracy | Precision | Recall | F1-Score | ROC-AUC |
+|-------|----------|-----------|--------|----------|---------|
+| Neural Network (MLP) | **86.89%** | 86.84% | 91.67% | **89.19%** | **93.67%** |
+| Support Vector Machine | 83.61% | 84.21% | 88.89% | 86.49% | 88.67% |
+| Random Forest | 83.61% | 84.21% | 88.89% | 86.49% | 90.61% |
+| XGBoost | 83.61% | 86.11% | 86.11% | 86.11% | 90.22% |
+| Logistic Regression | 81.97% | 82.05% | 88.89% | 85.33% | 88.33% |
+| Decision Tree | 81.97% | 79.07% | 94.44% | 86.08% | 79.22% |
+| Naive Bayes | 80.33% | 81.58% | 86.11% | 83.78% | 88.67% |
+| K-Nearest Neighbors | 55.74% | 61.54% | 66.67% | 64.00% | 57.00% |
+
+## Training Pipeline (`train.py`)
+
+1. **Download** dataset from Kaggle (1025 rows)
+2. **Deduplicate** → 302 unique records
+3. **Split** 80/20 → 241 train + 61 test (test is original-only for fair evaluation)
+4. **Augment** training set to 1000 rows using controlled noise injection:
+   - Continuous features: gaussian noise at 10% of std, clipped to data bounds
+   - Binary features: flipped with 10% probability
+   - Ordinal features: shifted ±1 with 15% probability
+   - Nominal features: swapped to another valid value with 10% probability
+5. **Train** all 8 models on augmented data
+6. **Evaluate** on original test set (6 metrics each)
+7. **Export** results & graphs to `static/results/`
+
+## Results & Graphs
+
+Generated automatically by `train.py` and saved to `static/results/`:
+
+| File | Description |
+|------|-------------|
+| `comparison.csv` | All metrics for all 8 models |
+| `comparison_line.png` | Multi-line chart (models × metrics) |
+| `comparison_bar.png` | Grouped bar chart comparison |
+| `confusion_matrices.png` | 8-panel confusion matrix grid |
+
+These are viewable at the `/models` route in the web app.
 
 ## Project Structure
 
 ```
 HeartDiseasePrediction/
-├── app.py                    # Flask web application
-├── train.py                  # Model training script
-├── requirements.txt          # Python dependencies
-├── vercel.json               # Vercel deployment config
-├── .python-version           # Python version for Vercel
+├── app.py                     # Flask web app (2 routes: /, /models)
+├── train.py                   # Training pipeline (download, dedup, augment, train, evaluate)
+├── requirements.txt           # Minimal Python dependencies
+├── vercel.json                # Vercel deployment config
+├── .python-version            # Python version for Vercel
+├── .gitattributes             # Line ending normalization
 ├── .gitignore
 ├── README.md
 ├── templates/
-│   └── index.html            # Web UI template
-├── models/                   # Pre-trained model files (8 models)
-├── data/                     # Dataset (downloaded by train.py, gitignored)
-└── flaskvenv/                # Virtual environment (gitignored)
+│   ├── index.html             # Prediction form (13 individual fields)
+│   └── models.html            # Model performance dashboard with graphs
+├── models/                    # 8 pre-trained model files (.pkl)
+├── data/                      # Dataset cache (gitignored)
+├── static/results/            # Generated metrics & graphs (gitignored)
+├── flaskvenv/                 # Virtual environment (gitignored)
+└── .vscode/
+    └── launch.json            # VS Code debugger configs
 ```
 
 ## Getting Started
@@ -69,64 +106,101 @@ HeartDiseasePrediction/
 
 - Python 3.9 or higher
 - pip
+- Kaggle API key (for `kagglehub` — kaggle.json in `~/.kaggle/`)
 
-### 1. Clone & Setup
+### 1. Setup
 
 ```bash
 git clone https://github.com/AetherSparks/Heart_Disease_Prediction.git
 cd Heart_Disease_Prediction
-```
-
-Create and activate a virtual environment:
-
-```bash
 python -m venv venv
+
 # Windows:
 venv\Scripts\activate
 # macOS/Linux:
 source venv/bin/activate
-```
 
-### 2. Install Dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
-### 3. Train Models
+### 2. Train Models
 
-This downloads the dataset (1025 records) via kagglehub, trains all 8 models, and saves them to `models/`:
+Downloads dataset, deduplicates, augments, trains all 8 models, and exports results:
 
 ```bash
 python train.py
 ```
 
-A bar chart comparing model accuracies will be displayed at the end.
-
-### 4. Run the Web App
+### 3. Run Web App
 
 ```bash
 python app.py
 ```
 
-Open http://127.0.0.1:5000 in your browser. Enter 13 comma-separated feature values, select a model, and click **Predict**.
+Open http://127.0.0.1:5000. Fill the 13 individual form fields (or click **Generate Random Data**), pick a model, and predict.
 
-### Example Input
+Visit http://127.0.0.1:5000/models to see the full model comparison dashboard with graphs.
 
-```
-63,1,1,145,233,1,2,150,0,2.3,3,0,6
-```
+## Deployment
 
-## Deploy to Vercel
+### Option 1: Vercel (Recommended)
 
-This project is pre-configured for Vercel deployment:
+This project is pre-configured for Vercel:
 
-1. Push the repo to GitHub
+1. Push to GitHub:
+   ```bash
+   git push -u origin main
+   ```
 2. Go to [vercel.com/new](https://vercel.com/new)
 3. Import your GitHub repository
-4. Vercel auto-detects Flask — no configuration needed
-5. Deploy
+4. Vercel auto-detects Flask — deploy with zero config
+5. Set environment variable `PYTHON_VERSION=3.12` if needed
 
-The `vercel.json` file and `.python-version` are already set up.
+**Vercel limits:**
+- Bundle size: 500MB (our deps are ~200MB without TensorFlow/PyTorch)
+- Cold starts: 1-3s on Fluid compute
+- Free tier: generous, but large ML deps may push limits
 
-> **Note:** Vercel has a 500MB bundle size limit. The minimal `requirements.txt` (no TensorFlow/PyTorch) keeps the deployment well under this limit.
+**Important:** Run `python train.py` locally and push the `models/` directory with the pre-trained `.pkl` files. Vercel doesn't run training — it serves predictions.
+
+### Option 2: PythonAnywhere (Free, Always-On)
+
+Better for ML apps since it's purpose-built for Python and doesn't sleep:
+
+1. Create account at [pythonanywhere.com](https://www.pythonanywhere.com)
+2. Open a Bash console and clone:
+   ```bash
+   git clone https://github.com/AetherSparks/Heart_Disease_Prediction.git
+   ```
+3. Create a virtualenv, install deps, upload the `models/` folder
+4. Set up a Web app → Manual config → Python/Flask
+5. Point WSGI at `app.py`
+
+**Limits:** 100 CPU-seconds/day, 512MB storage. Fine for lightweight usage.
+
+### Option 3: Render (Free, Spins Down After Inactivity)
+
+1. Push to GitHub
+2. Go to [render.com](https://render.com) → New Web Service
+3. Connect repo, set start command: `gunicorn app:app`
+4. Free tier spins down after 15min of inactivity (30-50s cold start)
+
+## VS Code Debugging
+
+Three launch configurations are provided in `.vscode/launch.json`:
+
+| Config | Purpose |
+|--------|---------|
+| **Run Flask App** | Debug `app.py` with Jinja template support |
+| **Run Train Script** | Debug `train.py` |
+| **Current File** | Debug whatever file is open |
+
+Press `F5` to start debugging with the selected config.
+
+## Git
+
+```bash
+git remote -v                   # Check remote
+git log --oneline --graph       # View history
+git push -u origin main         # Push to GitHub
+```
