@@ -167,7 +167,10 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-lg mt-3">Predict</button>
+        <div class="d-flex justify-content-between mt-3">
+            <button type="button" class="btn btn-secondary" onclick="fillRandom()">Generate Random Data</button>
+            <button type="submit" class="btn btn-primary btn-lg">Predict</button>
+        </div>
     </form>
 
     {% if prediction %}
@@ -201,5 +204,35 @@
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function rand(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+function randf(min, max, dec) {
+    return (Math.random() * (max - min) + min).toFixed(dec);
+}
+function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+function fillRandom() {
+    document.getElementById('age').value = rand(29, 77);
+    document.getElementById('sex').value = pick([0, 1]);
+    document.getElementById('cp').value = pick([1, 2, 3, 4]);
+    document.getElementById('trestbps').value = rand(90, 200);
+    document.getElementById('chol').value = rand(120, 400);
+    document.getElementById('fbs').value = pick([0, 1]);
+    document.getElementById('restecg').value = rand(0, 2);
+    document.getElementById('thalach').value = rand(70, 210);
+    document.getElementById('exang').value = pick([0, 1]);
+    document.getElementById('oldpeak').value = randf(0, 6, 1);
+    document.getElementById('slope').value = rand(0, 2);
+    document.getElementById('ca').value = rand(0, 4);
+    document.getElementById('thal').value = pick([3, 6, 7]);
+    document.getElementById('model').value = pick([
+        'Logistic Regression', 'Naive Bayes', 'SVM', 'KNN',
+        'Decision Tree', 'Random Forest', 'XGBoost', 'Neural Network'
+    ]);
+}
+</script>
 </body>
 </html>
