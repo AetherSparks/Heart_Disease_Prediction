@@ -26,38 +26,38 @@ A production-ready Flask web application that predicts the presence of heart dis
 
 ## Overview
 
-| Capability | Detail |
-|-----------|--------|
-| **Models** | 8 individual architectures + 1 Voting Ensemble (soft) |
-| **Training** | SMOTE oversampling, GridSearchCV hyperparameter tuning, Stratified K-Fold CV |
-| **Explainability** | Permutation feature importance with per-model visualizations |
-| **Web UI** | Flask with Tailwind CSS — prediction form + benchmark dashboard |
-| **API** | RESTful JSON API (`/api/predict`, `/api/models`, `/api/metrics`, `/api/feature_importance`) |
-| **Validation** | Pydantic schemas with range constraints on all inputs |
-| **Logging** | Structured logging via Loguru (rotated files) |
-| **Testing** | Pytest suite (route tests, API validation, error handling) |
-| **Containerization** | Docker + Docker Compose |
-| **CI/CD** | GitHub Actions (lint, test on every push/PR) |
+| Capability           | Detail                                                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------- |
+| **Models**           | 8 individual architectures + 1 Voting Ensemble (soft)                                       |
+| **Training**         | SMOTE oversampling, GridSearchCV hyperparameter tuning, Stratified K-Fold CV                |
+| **Explainability**   | Permutation feature importance with per-model visualizations                                |
+| **Web UI**           | Flask with Tailwind CSS — prediction form + benchmark dashboard                             |
+| **API**              | RESTful JSON API (`/api/predict`, `/api/models`, `/api/metrics`, `/api/feature_importance`) |
+| **Validation**       | Pydantic schemas with range constraints on all inputs                                       |
+| **Logging**          | Structured logging via Loguru (rotated files)                                               |
+| **Testing**          | Pytest suite (route tests, API validation, error handling)                                  |
+| **Containerization** | Docker + Docker Compose                                                                     |
+| **CI/CD**            | GitHub Actions (lint, test on every push/PR)                                                |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Backend** | Python 3.12+, Flask, Gunicorn |
+| Layer             | Technology                                              |
+| ----------------- | ------------------------------------------------------- |
+| **Backend**       | Python 3.12+, Flask, Gunicorn                           |
 | **ML / Training** | scikit-learn, XGBoost, joblib, imbalanced-learn (SMOTE) |
-| **Data** | pandas, NumPy, kagglehub |
-| **Validation** | Pydantic v2 |
-| **Logging** | Loguru |
-| **Visualization** | Matplotlib, Seaborn |
-| **Frontend** | HTML, Tailwind CSS (CDN), Inter Font |
-| **API** | RESTful JSON endpoints |
-| **Testing** | pytest, pytest-flask |
-| **Deployment** | Vercel (`vercel.json`), Docker, Render, PythonAnywhere |
-| **CI/CD** | GitHub Actions |
-| **Debugging** | VS Code (`launch.json`) |
-| **Scaler** | StandardScaler (fitted on train, saved for inference) |
+| **Data**          | pandas, NumPy, kagglehub                                |
+| **Validation**    | Pydantic v2                                             |
+| **Logging**       | Loguru                                                  |
+| **Visualization** | Matplotlib, Seaborn                                     |
+| **Frontend**      | HTML, Tailwind CSS (CDN), Inter Font                    |
+| **API**           | RESTful JSON endpoints                                  |
+| **Testing**       | pytest, pytest-flask                                    |
+| **Deployment**    | Vercel (`vercel.json`), Docker, Render, PythonAnywhere  |
+| **CI/CD**         | GitHub Actions                                          |
+| **Debugging**     | VS Code (`launch.json`)                                 |
+| **Scaler**        | StandardScaler (fitted on train, saved for inference)   |
 
 ---
 
@@ -75,22 +75,22 @@ The dataset is automatically downloaded from Kaggle via `kagglehub` when `train.
 
 ### Features
 
-| # | Feature | Type | Range | Description |
-|---|---------|------|-------|-------------|
-| 1 | `age` | Continuous | 0–150 | Age in years |
-| 2 | `sex` | Binary | 0–1 | 1 = male, 0 = female |
-| 3 | `cp` | Ordinal | 1–4 | Chest pain type |
-| 4 | `trestbps` | Continuous | 50–300 | Resting blood pressure (mm Hg) |
-| 5 | `chol` | Continuous | 50–700 | Serum cholesterol (mg/dl) |
-| 6 | `fbs` | Binary | 0–1 | Fasting blood sugar > 120 mg/dl |
-| 7 | `restecg` | Ordinal | 0–2 | Resting ECG results |
-| 8 | `thalach` | Continuous | 30–250 | Max heart rate achieved |
-| 9 | `exang` | Binary | 0–1 | Exercise induced angina |
-| 10 | `oldpeak` | Continuous | 0–10 | ST depression induced by exercise |
-| 11 | `slope` | Ordinal | 0–2 | ST segment slope |
-| 12 | `ca` | Ordinal | 0–4 | Major vessels colored (fluoroscopy) |
-| 13 | `thal` | Nominal | 3, 6, 7 | Thalassemia type |
-| **Target** | `target` | Binary | 0–1 | 0 = no disease, 1 = disease present |
+| #          | Feature    | Type       | Range   | Description                         |
+| ---------- | ---------- | ---------- | ------- | ----------------------------------- |
+| 1          | `age`      | Continuous | 0–150   | Age in years                        |
+| 2          | `sex`      | Binary     | 0–1     | 1 = male, 0 = female                |
+| 3          | `cp`       | Ordinal    | 1–4     | Chest pain type                     |
+| 4          | `trestbps` | Continuous | 50–300  | Resting blood pressure (mm Hg)      |
+| 5          | `chol`     | Continuous | 50–700  | Serum cholesterol (mg/dl)           |
+| 6          | `fbs`      | Binary     | 0–1     | Fasting blood sugar > 120 mg/dl     |
+| 7          | `restecg`  | Ordinal    | 0–2     | Resting ECG results                 |
+| 8          | `thalach`  | Continuous | 30–250  | Max heart rate achieved             |
+| 9          | `exang`    | Binary     | 0–1     | Exercise induced angina             |
+| 10         | `oldpeak`  | Continuous | 0–10    | ST depression induced by exercise   |
+| 11         | `slope`    | Ordinal    | 0–2     | ST segment slope                    |
+| 12         | `ca`       | Ordinal    | 0–4     | Major vessels colored (fluoroscopy) |
+| 13         | `thal`     | Nominal    | 3, 6, 7 | Thalassemia type                    |
+| **Target** | `target`   | Binary     | 0–1     | 0 = no disease, 1 = disease present |
 
 ---
 
@@ -98,52 +98,52 @@ The dataset is automatically downloaded from Kaggle via `kagglehub` when `train.
 
 All models trained with SMOTE-balanced data and evaluated on the original held-out test set (61 records). Hyperparameters tuned via GridSearchCV with 5-fold Stratified K-Fold cross-validation.
 
-| Model | Accuracy | Precision | Recall | F1-Score | ROC-AUC | Specificity |
-|-------|----------|-----------|--------|----------|---------|-------------|
-| **Neural Network (MLP)** | **86.89%** | 86.84% | 91.67% | **89.19%** | **93.67%** | 80.00% |
-| **Voting Ensemble** | **86.89%** | **88.57%** | 88.89% | 88.73% | 92.78% | **84.00%** |
-| Support Vector Machine | 83.61% | 84.21% | 88.89% | 86.49% | 88.67% | 76.00% |
-| Random Forest | 83.61% | 84.21% | 88.89% | 86.49% | 90.61% | 76.00% |
-| XGBoost | 83.61% | 86.11% | 86.11% | 86.11% | 90.22% | 80.00% |
-| Logistic Regression | 81.97% | 82.05% | 88.89% | 85.33% | 88.33% | 72.00% |
-| Decision Tree | 81.97% | 79.07% | 94.44% | 86.08% | 79.22% | 64.00% |
-| Naive Bayes | 80.33% | 81.58% | 86.11% | 83.78% | 88.67% | 72.00% |
-| K-Nearest Neighbors | 55.74% | 61.54% | 66.67% | 64.00% | 57.00% | 40.00% |
+| Model                    | Accuracy   | Precision  | Recall | F1-Score   | ROC-AUC    | Specificity |
+| ------------------------ | ---------- | ---------- | ------ | ---------- | ---------- | ----------- |
+| **Neural Network (MLP)** | **86.89%** | 86.84%     | 91.67% | **89.19%** | **93.67%** | 80.00%      |
+| **Voting Ensemble**      | **86.89%** | **88.57%** | 88.89% | 88.73%     | 92.78%     | **84.00%**  |
+| Support Vector Machine   | 83.61%     | 84.21%     | 88.89% | 86.49%     | 88.67%     | 76.00%      |
+| Random Forest            | 83.61%     | 84.21%     | 88.89% | 86.49%     | 90.61%     | 76.00%      |
+| XGBoost                  | 83.61%     | 86.11%     | 86.11% | 86.11%     | 90.22%     | 80.00%      |
+| Logistic Regression      | 81.97%     | 82.05%     | 88.89% | 85.33%     | 88.33%     | 72.00%      |
+| Decision Tree            | 81.97%     | 79.07%     | 94.44% | 86.08%     | 79.22%     | 64.00%      |
+| Naive Bayes              | 80.33%     | 81.58%     | 86.11% | 83.78%     | 88.67%     | 72.00%      |
+| K-Nearest Neighbors      | 55.74%     | 61.54%     | 66.67% | 64.00%     | 57.00%     | 40.00%      |
 
 ### Model Details
 
-| Model | Algorithm | Tuned Hyperparameters |
-|-------|-----------|----------------------|
-| Logistic Regression | `LogisticRegression` | `C` (0.01–10), `solver` (liblinear, lbfgs) |
-| Naive Bayes | `GaussianNB` | Default (no tunable params) |
-| SVM | `SVC` (probability=True) | `C` (0.1–10), `kernel` (linear, rbf), `gamma` (scale, auto) |
-| KNN | `KNeighborsClassifier` | `n_neighbors` (3–15), `weights` (uniform, distance) |
-| Decision Tree | `DecisionTreeClassifier` | `max_depth` (3–None), `min_samples_split` (2–10) |
-| Random Forest | `RandomForestClassifier` | `n_estimators` (50–200), `max_depth` (5–None), `min_samples_split` (2–5) |
-| XGBoost | `XGBClassifier` | `n_estimators` (50–100), `max_depth` (3–7), `learning_rate` (0.01–0.3) |
-| Neural Network | `MLPClassifier` | `hidden_layer_sizes` [(11,), (20,), (11,5)], `activation` (relu, tanh), `alpha` (0.0001–0.001) |
-| **Voting Ensemble** | `VotingClassifier` (soft) | Logistic Regression + Random Forest + XGBoost + Neural Network |
+| Model               | Algorithm                 | Tuned Hyperparameters                                                                          |
+| ------------------- | ------------------------- | ---------------------------------------------------------------------------------------------- |
+| Logistic Regression | `LogisticRegression`      | `C` (0.01–10), `solver` (liblinear, lbfgs)                                                     |
+| Naive Bayes         | `GaussianNB`              | Default (no tunable params)                                                                    |
+| SVM                 | `SVC` (probability=True)  | `C` (0.1–10), `kernel` (linear, rbf), `gamma` (scale, auto)                                    |
+| KNN                 | `KNeighborsClassifier`    | `n_neighbors` (3–15), `weights` (uniform, distance)                                            |
+| Decision Tree       | `DecisionTreeClassifier`  | `max_depth` (3–None), `min_samples_split` (2–10)                                               |
+| Random Forest       | `RandomForestClassifier`  | `n_estimators` (50–200), `max_depth` (5–None), `min_samples_split` (2–5)                       |
+| XGBoost             | `XGBClassifier`           | `n_estimators` (50–100), `max_depth` (3–7), `learning_rate` (0.01–0.3)                         |
+| Neural Network      | `MLPClassifier`           | `hidden_layer_sizes` [(11,), (20,), (11,5)], `activation` (relu, tanh), `alpha` (0.0001–0.001) |
+| **Voting Ensemble** | `VotingClassifier` (soft) | Logistic Regression + Random Forest + XGBoost + Neural Network                                 |
 
 ---
 
 ## Enhancements Over Baseline
 
-| Feature | Baseline | Enhanced |
-|---------|----------|----------|
-| **Data Balancing** | Manual noise injection (ad-hoc) | **SMOTE** — synthetic minority oversampling |
-| **Hyperparameter Tuning** | None (default params) | **GridSearchCV** with 5-fold Stratified K-Fold |
-| **Feature Importance** | Not available | **Permutation importance** — per-model bar charts + JSON export |
-| **Ensemble Model** | None | **VotingClassifier** (soft) — 4-model ensemble |
-| **Input Validation** | Manual float casts | **Pydantic v2** schemas with range constraints |
-| **API** | HTML form only | **RESTful API** — `/api/predict`, `/api/models`, `/api/metrics`, `/api/feature_importance` |
-| **Logging** | `print()` statements | **Loguru** — structured, rotated logs |
-| **Testing** | None | **pytest** — 10 test cases (routes, API, validation, errors) |
-| **CI/CD** | None | **GitHub Actions** — auto-test on push/PR |
-| **Containerization** | None | **Docker** + **Docker Compose** |
-| **Scaler** | Not used | **StandardScaler** — fitted on train, applied at inference |
-| **Feature Visualization** | Static metric charts | **Feature importance bar charts** — displayed on dashboard |
-| **Frontend UX** | Basic metrics badges | **Top-5 feature bars** — visualized alongside prediction result |
-| **Vercel Config** | Basic | Updated with function config (%3.12) |
+| Feature                   | Baseline                        | Enhanced                                                                                   |
+| ------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------ |
+| **Data Balancing**        | Manual noise injection (ad-hoc) | **SMOTE** — synthetic minority oversampling                                                |
+| **Hyperparameter Tuning** | None (default params)           | **GridSearchCV** with 5-fold Stratified K-Fold                                             |
+| **Feature Importance**    | Not available                   | **Permutation importance** — per-model bar charts + JSON export                            |
+| **Ensemble Model**        | None                            | **VotingClassifier** (soft) — 4-model ensemble                                             |
+| **Input Validation**      | Manual float casts              | **Pydantic v2** schemas with range constraints                                             |
+| **API**                   | HTML form only                  | **RESTful API** — `/api/predict`, `/api/models`, `/api/metrics`, `/api/feature_importance` |
+| **Logging**               | `print()` statements            | **Loguru** — structured, rotated logs                                                      |
+| **Testing**               | None                            | **pytest** — 10 test cases (routes, API, validation, errors)                               |
+| **CI/CD**                 | None                            | **GitHub Actions** — auto-test on push/PR                                                  |
+| **Containerization**      | None                            | **Docker** + **Docker Compose**                                                            |
+| **Scaler**                | Not used                        | **StandardScaler** — fitted on train, applied at inference                                 |
+| **Feature Visualization** | Static metric charts            | **Feature importance bar charts** — displayed on dashboard                                 |
+| **Frontend UX**           | Basic metrics badges            | **Top-5 feature bars** — visualized alongside prediction result                            |
+| **Vercel Config**         | Basic                           | Updated with function config (%3.12)                                                       |
 
 ---
 
@@ -192,11 +192,11 @@ Make a prediction with any loaded model.
   "roc_auc": 90.61,
   "specificity": 76.0,
   "top_features": [
-    {"name": "cp", "importance": 0.0923, "pct": 100.0},
-    {"name": "thal", "importance": 0.0876, "pct": 94.9},
-    {"name": "ca", "importance": 0.0792, "pct": 85.8},
-    {"name": "oldpeak", "importance": 0.0764, "pct": 82.8},
-    {"name": "thalach", "importance": 0.0711, "pct": 77.0}
+    { "name": "cp", "importance": 0.0923, "pct": 100.0 },
+    { "name": "thal", "importance": 0.0876, "pct": 94.9 },
+    { "name": "ca", "importance": 0.0792, "pct": 85.8 },
+    { "name": "oldpeak", "importance": 0.0764, "pct": 82.8 },
+    { "name": "thalach", "importance": 0.0711, "pct": 77.0 }
   ]
 }
 ```
@@ -423,18 +423,18 @@ pytest --cov=app tests/
 
 **Test coverage:**
 
-| Test | What it verifies |
-|------|------------------|
-| `test_index_get` | GET / returns 200 with expected content |
-| `test_models_page` | GET /models returns 200 |
-| `test_api_models_endpoint` | GET /api/models returns model list |
-| `test_api_metrics_endpoint` | GET /api/metrics returns metrics |
+| Test                                   | What it verifies                         |
+| -------------------------------------- | ---------------------------------------- |
+| `test_index_get`                       | GET / returns 200 with expected content  |
+| `test_models_page`                     | GET /models returns 200                  |
+| `test_api_models_endpoint`             | GET /api/models returns model list       |
+| `test_api_metrics_endpoint`            | GET /api/metrics returns metrics         |
 | `test_api_feature_importance_endpoint` | GET /api/feature_importance returns data |
-| `test_api_predict_missing_model` | POST with invalid model name → 400 |
-| `test_api_predict_invalid_age` | POST with out-of-range age → 400 |
-| `test_api_predict_missing_fields` | POST with partial body → 400 |
-| `test_form_post_missing_model` | POST form without model → 400 |
-| `test_404_handler` | GET /nonexistent → 404 |
+| `test_api_predict_missing_model`       | POST with invalid model name → 400       |
+| `test_api_predict_invalid_age`         | POST with out-of-range age → 400         |
+| `test_api_predict_missing_fields`      | POST with partial body → 400             |
+| `test_form_post_missing_model`         | POST form without model → 400            |
+| `test_404_handler`                     | GET /nonexistent → 404                   |
 
 ---
 
@@ -442,11 +442,11 @@ pytest --cov=app tests/
 
 Three launch configurations in `.vscode/launch.json`:
 
-| Configuration | Purpose |
-|---------------|---------|
-| **Run Flask App** | Debug `app.py` with Jinja template support |
-| **Run Train Script** | Debug `train.py` |
-| **Current File** | Debug any open Python file |
+| Configuration        | Purpose                                    |
+| -------------------- | ------------------------------------------ |
+| **Run Flask App**    | Debug `app.py` with Jinja template support |
+| **Run Train Script** | Debug `train.py`                           |
+| **Current File**     | Debug any open Python file                 |
 
 Press `F5` to start debugging.
 
