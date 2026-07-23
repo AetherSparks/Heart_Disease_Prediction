@@ -10,3 +10,5 @@ data/
 dist/
 build/
 static/results/
+tests/__pycache__/
+*.log

@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  heart-disease-api:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./models:/app/models
+      - ./static:/app/static
+    environment:
+      - FLASK_ENV=production
+    restart: unless-stopped

@@ -100,6 +100,17 @@
             </div>
         </div>
 
+        <!-- Feature Importance Visualization -->
+        {% if feature_importance_available %}
+        <div class="bg-slate-800/40 p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col items-center max-w-4xl mx-auto mb-12">
+            <h4 class="text-sm font-bold tracking-wider uppercase text-slate-400 mb-4">Feature Importance by Model (Permutation)</h4>
+            <div class="w-full bg-slate-900 rounded-xl p-4 border border-slate-800">
+                <img class="w-full h-auto rounded-lg mx-auto object-contain" src="/static/results/feature_importance.png" alt="Feature Importance" onerror="this.style.display='none'" />
+            </div>
+            <p class="text-xs text-slate-500 mt-3">Positive values (red) increase heart disease risk; negative values (blue) decrease it.</p>
+        </div>
+        {% endif %}
+
         <div class="text-center">
             <a href="/" class="inline-flex items-center space-x-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-medium text-sm rounded-xl border border-slate-700 transition">
                 <svg class="w-4 h-4 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
